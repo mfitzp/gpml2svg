@@ -35,7 +35,8 @@ setup(
     packages = find_packages(),
     include_package_data = True,
     package_data = {
-        '': ['*.txt', '*.rst', '*.md', '.svg'],
+        '': ['*.txt', '*.rst', '*.md'],
+        'gpml2svg':['*.svg'],
     },
     exclude_package_data = { '': ['README.txt'] },
 
@@ -59,7 +60,4 @@ setup(
                'Intended Audience :: Science/Research',
                'Intended Audience :: Education',
               ],
-    app=[ 'gpml2svg/gpml2svg.py' ],
-
-
     )
