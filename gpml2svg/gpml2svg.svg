@@ -93,7 +93,21 @@
         @endfor
 
     </defs>
-  
+
+    <g class="line">
+    @for o in interactions:
+        <polyline points="
+            @for p in o['path']:
+                @p[0]!s,@p[1]!s
+            @endfor
+            " style="
+            @for s in o['styles']:
+                @s!s                
+            @endfor
+            " marker-start="url(#@o['marker_start']_@o['color']!s)" marker-end="url(#@o['marker_end']_@o['color']!s)"/>
+    @endfor
+    </g>    
+
     <g class="text">
         @for k,t in text.items():
             <text x="10" y="@t[1]!s" style="fill:black; stroke:none;"><tspan style="font-weight:bold;@">@k:</tspan> @t[0]</text>
@@ -138,20 +152,6 @@
                 </a>
         @endfor
     </g>
-
-    <g class="line">
-    @for o in interactions:
-        <polyline points="
-            @for p in o['path']:
-                @p[0]!s,@p[1]!s
-            @endfor
-            " style="
-            @for s in o['styles']:
-                @s!s                
-            @endfor
-            " marker-start="url(#@o['marker_start']_@o['color']!s)" marker-end="url(#@o['marker_end']_@o['color']!s)"/>
-    @endfor
-    </g>    
 
     <g class="group">
         @for o in groups:
