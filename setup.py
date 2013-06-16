@@ -7,7 +7,7 @@ distribute_setup.use_setuptools()
 
 from setuptools import setup, find_packages
 
-version_string = '0.1.2'
+version_string = '0.1.3'
 
 
 # Defaults for py2app / cx_Freeze
@@ -54,7 +54,7 @@ setup(
                'Natural Language :: English',
                'Operating System :: OS Independent',
                'Programming Language :: Python :: 2',
-               'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+               'License :: OSI Approved :: BSD License',
                'Topic :: Scientific/Engineering :: Bio-Informatics',
                'Topic :: Education',
                'Intended Audience :: Science/Research',
