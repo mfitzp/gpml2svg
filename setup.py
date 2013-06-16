@@ -42,7 +42,7 @@ setup(
 
     entry_points = {
         'console_scripts': [
-            'gpml2svg' = 'gpml2svg.gpml2svg:main',
+            'gpml2svg = gpml2svg.gpml2svg:main',
         ],
     },
 
