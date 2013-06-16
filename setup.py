@@ -23,7 +23,7 @@ setup(
     author='Martin Fitzpatrick',
     author_email='martin.fitzpatrick@gmail.com',
     url='https://github.com/mfitzp/gpml2svg',
-    download_url='http://github.com/mfitzp/gpml2svg',
+    download_url='https://github.com/mfitzp/gpml2svg/zipball/master'
     description='Render GPML pathway markup to SVG from the commandline/Python.',
     long_description='GPML2SVG is a command line and Python API for the conversion of pathways marked up \
         using GPML to SVG. The command-line interface is currently basic. Simply call the script with the name of the \
@@ -59,5 +59,7 @@ setup(
                'Intended Audience :: Science/Research',
                'Intended Audience :: Education',
               ],
+    app=[ 'gpml2svg/gpml2svg.py' ],
+
 
     )
