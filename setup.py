@@ -18,7 +18,7 @@ default_build_options=dict(
 
 setup(
 
-    name='metapath',
+    name='gpml2svg',
     version=version_string,
     author='Martin Fitzpatrick',
     author_email='martin.fitzpatrick@gmail.com',
@@ -59,7 +59,5 @@ setup(
                'Intended Audience :: Science/Research',
                'Intended Audience :: Education',
               ],
-
-    executables=executables,
 
     )
