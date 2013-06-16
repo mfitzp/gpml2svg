@@ -42,14 +42,14 @@ setup(
 
     entry_points = {
         'console_scripts': [
-            'gpml2svg = gpml2svg.gpml2svg:main',
+            'gpml2svg' = 'gpml2svg.gpml2svg:main',
         ],
     },
 
     install_requires = ['wheezy.template>=0.1.135'],
 
     keywords='bioinformatics metabolomics signalling pathways research analysis science',
-    license='GPL',
+    license='BSD',
     classifiers=['Development Status :: 4 - Beta',
                'Natural Language :: English',
                'Operating System :: OS Independent',
