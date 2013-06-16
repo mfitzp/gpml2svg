@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import re, cgi, codecs, copy
+import re, cgi, codecs, copy, sys
 try:
     import xml.etree.cElementTree as et
 except ImportError:
@@ -548,9 +548,12 @@ def main():
     parser = OptionParser()
 
     parser.add_option("-f", "--file", dest="file", default=None,
-                      help="load data file by name, name root used as basis for output graph filenames", metavar="FILE")
+                      help="load GPML file by name, name root used as basis for output SVG file", metavar="FILE")
 
     (options, args) = parser.parse_args()
+    if options.file is None:
+        parser.print_help()
+        sys.exit(1)
 
 
     f = open(options.file,'r')
