@@ -548,7 +548,10 @@ def main():
     parser = OptionParser()
 
     parser.add_option("-f", "--file", dest="file", default=None,
-                      help="load GPML file by name, name root used as basis for output SVG file", metavar="FILE")
+                      help="load GPML file by name, name root used as basis for output SVG file unless specified", metavar="FILE")
+
+    parser.add_option("-o", "--outfile", dest="outfile", default=None,
+                      help="save resulting SVG with this name (if you omit this option it will be saved with the same name as source GPML with the extension changed)", metavar="FILE")
 
     (options, args) = parser.parse_args()
     if options.file is None:
@@ -562,8 +565,10 @@ def main():
 
     svg = gpml2svg( gpml )
 
-    outfile_name = options.file.replace('gpml','svg')
-    o = codecs.open('test.svg','w','utf-8')
+    if options.outfile is None:
+        options.outfile = options.file.replace('gpml','svg')
+        
+    o = codecs.open(options.outfile,'w','utf-8')
     o.write( svg )
     o.close()
 
