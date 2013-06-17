@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import re, cgi, codecs, copy, sys
+import os, re, cgi, codecs, copy, sys
 try:
     import xml.etree.cElementTree as et
 except ImportError:
@@ -14,6 +14,10 @@ from wheezy.template.loader import FileLoader
 
 from collections import defaultdict
 from optparse import OptionParser
+
+
+# Get current running script folder (MetaPath app folder)
+scriptdir = os.path.realpath(__file__).rpartition('/')[0]
 
 
 # Standard definitions
@@ -72,12 +76,13 @@ def get_styles( o, restyle ):
 def gpml2svg(
     gpml, 
     node_colors = {},
-#    synonyms = {},
     xrefs = {
         'HMDB': 'http://www.hmdb.ca/metabolites/%s',
         'WikiPathways': 'http://wikipathways.org/index.php/Pathway:%s',
         'Entrez Gene': 'http://www.ncbi.nlm.nih.gov/gene/%s',
-    }
+    },
+    xrefs_synonyms = {}, # A conversion dictionary to generate additional XRefs
+    xrefs_classes = ['HMDB','Entrez Gene'], # A list of XRefs to use to generate data node classes (post-coloring/transformations)
     ):
 
 
@@ -539,8 +544,7 @@ def gpml2svg(
         'graphids': graphids,
     }
 
-    template = templateEngine.get_template('gpml2svg.svg')
-
+    template = templateEngine.get_template( os.path.join( scriptdir,'gpml2svg.svg') )
     return template.render( metadata )
 
 def main():
@@ -571,7 +575,6 @@ def main():
     o = codecs.open(options.outfile,'w','utf-8')
     o.write( svg )
     o.close()
-
 
 if __name__ == "__main__":
     main()
