@@ -31,4 +31,4 @@ via [WikiPathways][wikipathways].
 
  [pathvisio]: http://www.pathvisio.org/
  [wikipathways]: http://wikipathways.org/
- 
+ [gpml]: http://www.wikipathways.org/index.php/Help:Frequently_Asked_Questions#What_is_GPML.3F

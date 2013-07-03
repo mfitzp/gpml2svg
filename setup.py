@@ -7,8 +7,7 @@ distribute_setup.use_setuptools()
 
 from setuptools import setup, find_packages
 
-version_string = '0.1.5'
-
+version_string = '0.1.13'
 
 # Defaults for py2app / cx_Freeze
 default_build_options=dict(
@@ -36,7 +35,7 @@ setup(
     include_package_data = True,
     package_data = {
         '': ['*.txt', '*.rst', '*.md'],
-        'gpml2svg':['*.svg'],
+        'gpml2svg':['gpml2svg.svg'],
     },
     exclude_package_data = { '': ['README.txt'] },
 

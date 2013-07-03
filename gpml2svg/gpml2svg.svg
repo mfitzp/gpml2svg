@@ -171,7 +171,13 @@
                     @s!s                
                 @endfor
                 " />
-                <a xlink:href="@o['url']!s">
+                @if o['url']:
+                    <a xlink:href="@o['url']!s"  style="
+                    @for s in o['text_styles']:
+                        @s!s                
+                    @endfor
+                    ">
+                @endif
                     <text x="@o['xc']!s" y="@o['yc']!s" style="
                     @for s in o['text_styles']:
                         @s!s                
@@ -186,7 +192,9 @@
                         @endfor
                     @endif
                     </text>    
-                </a>
+                @if o['url']:
+                    </a>
+                @endif
             </g>
     @endfor
     </g>

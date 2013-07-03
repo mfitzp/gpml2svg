@@ -15,13 +15,30 @@ from wheezy.template.loader import FileLoader
 from collections import defaultdict
 from optparse import OptionParser
 
+import pkg_resources
 
-# Get current running script folder (MetaPath app folder)
-scriptdir = os.path.realpath(__file__).rpartition('/')[0]
+# Get current running script folder
+# scriptdir = os.path.realpath(__file__).rpartition('/')[0]
 
 
 # Standard definitions
 et.register_namespace('', 'http://pathvisio.org/GPML/2013a')
+
+GPML2SVG_XREF_URLS = {
+    'HMDB': 'http://www.hmdb.ca/metabolites/%s',
+    'WikiPathways': 'http://wikipathways.org/index.php/Pathway:%s',
+    'Entrez Gene': 'http://www.ncbi.nlm.nih.gov/gene/%s',
+    'PubChem-compound': 'http://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid=%s',
+    'Uniprot/TrEMBL': 'http://www.uniprot.org/uniprot/%s',
+    'KEGG Orthology': 'http://www.genome.jp/dbget-bin/www_bget?ko+%s',
+    'Kegg Compound': 'http://www.kegg.jp/entry/%s',
+    'MetaCyc Compound': 'http://biocyc.org/META/NEW-IMAGE?type=COMPOUND&object=%s',
+}
+
+
+class PkgLoader(object):
+    def load(self,name):
+        return pkg_resources.resource_string( __name__, 'gpml2svg.svg' ) 
 
 
 def get_edge( x, y, xo, yo, xt, yt):
@@ -72,17 +89,16 @@ def get_styles( o, restyle ):
 
     return styles
 
+def ci_dict_get( d, k):
+    pass
 
 def gpml2svg(
     gpml, 
     node_colors = {},
-    xrefs = {
-        'HMDB': 'http://www.hmdb.ca/metabolites/%s',
-        'WikiPathways': 'http://wikipathways.org/index.php/Pathway:%s',
-        'Entrez Gene': 'http://www.ncbi.nlm.nih.gov/gene/%s',
-    },
-    xrefs_synonyms = {}, # A conversion dictionary to generate additional XRefs
-    xrefs_classes = ['HMDB','Entrez Gene'], # A list of XRefs to use to generate data node classes (post-coloring/transformations)
+    xref_urls = GPML2SVG_XREF_URLS,
+    xref_synonyms = {}, # A conversion dictionary to generate additional XRefs
+                     # formatted as a dict of tuples  {('KEGG Compound','C00221'), ('MetaCyc','GLUCOSE')}
+    xref_synonyms_fn = None # A callback to return a tuple of target xref
     ):
 
 
@@ -93,16 +109,21 @@ def gpml2svg(
     gpml = re.sub(' xmlns="[^"]+"', '', gpml, count=1) # Strip namespace
 
     tree = et.fromstring(gpml.encode('utf-8'))
+    
     templateEngine = Engine(
-                loader=FileLoader( '.' ),
+                loader=PkgLoader(),
                 extensions=[CoreExtension()]
             )
+    template = templateEngine.get_template( 'gpml2svg.svg' )
+
 
     # Get root page canvas size, pathway name and copyright data from the header
     text = {}
+    metadata = {}
     y = 0
     for k in ['Name', 'Last-Modified', 'Organism', 'License']:
         if k in tree.attrib:
+            metadata[k] = tree.attrib[k]
             y += 15
             text[k] = (tree.attrib[k], y) 
     
@@ -131,7 +152,7 @@ def gpml2svg(
         }
         
     restyle_t = {
-        'Color': 'fill:%s',
+        'Color': 'fill:%s;',
     }
 
     for dn in data_nodes:
@@ -145,21 +166,34 @@ def gpml2svg(
         node_styles = get_styles( g, restyle_n )
         text_styles = get_styles( g, restyle_t )
 
-        # Data visualisation
-        xrs = list( dn.iterfind('Xref') )    
+        xrefs = dict()
+        xrs = list( dn.iterfind('Xref') )
         for xr in xrs:
-            if xr.attrib['ID'] in node_colors.keys():
-                node_styles.append( 'fill:%s; stroke:%s;' % (node_colors[ xr.attrib['ID']][0] , node_colors[ xr.attrib['ID'] ][0] ) )
-                text_styles.append( 'fill:%s;' % node_colors[ xr.attrib['ID']][1] )
-                break
-                
-        url = ''
-        xrs = list( dn.iterfind('Xref') )    
-        for xr in xrs:
-            if xr.attrib['Database'] in xrefs.keys():
-                url = xrefs[ xr.attrib['Database'] ] % xr.attrib['ID']             
+            xdb = xr.attrib['Database']
+            xid = xr.attrib['ID']
+            xrefs[ xdb ] = xid
+            # Process Xref synonyms
+            if ( xdb, xid ) in xref_synonyms.keys():
+                xref_extra = xref_synonyms[ ( xdb, xid ) ]
+                xrefs[ xref_extra[0] ] = xref_extra[1]
+        
+        if xref_synonyms_fn:
+            xrefs = xref_synonyms_fn( xrefs )
+            
+        url = None
+        for xdb, xid in xrefs.items():
+            if xdb in xref_urls.keys():
+                url = xref_urls[ xdb ] % xid     
                 break
 
+        # Data visualisation
+        # xrs = list( dn.iterfind('Xref') )    
+        for xdb,xid in xrefs.items():
+            if (xdb,xid) in node_colors.keys():
+                node_styles.append( 'fill:%s; stroke:%s;' % (node_colors[ (xdb,xid) ][0], node_colors[ (xdb,xid) ][0] ) )
+                text_styles.append( 'fill:%s;' % node_colors[ (xdb,xid) ][1] )
+                break
+                
         width  = float(g.attrib['Width'])
         height = float(g.attrib['Height'])
 
@@ -362,10 +396,14 @@ def gpml2svg(
         path = []
         xp, yp = False, False
         for p in ps:
-                
-            x = float(p.attrib['X'])
-            y = float(p.attrib['Y'])
 
+            try:                
+                x = float(p.attrib['X'])
+                y = float(p.attrib['Y'])
+            except: # wtf?
+                x = float(p.attrib['x'])
+                y = float(p.attrib['y'])
+                            
             if 'GraphRef' in p.attrib:
                 graphref = p.attrib['GraphRef']
                 d = get_direction(xp, yp, x, y)
@@ -374,7 +412,7 @@ def gpml2svg(
             else:
                 graphref = False
 
-            path.append( (x, y, graphref) )
+            path.append( (x, y, graphref, '-') )
             xp, yp = x, y
             
         
@@ -406,7 +444,9 @@ def gpml2svg(
 
         anchor = []
         for a in anchors:
-            anchor.append( a.attrib['GraphId'] )
+            if 'GraphId' in a.attrib:
+                anchor.append( a.attrib['GraphId'] )
+        
 
         idata = {
                 'path': path,
@@ -445,7 +485,7 @@ def gpml2svg(
         gdir = dirs[ get_direction( path[0][0], path[0][1], path[-1][0], path[-1][1]) ]
         
         # START: Draw out from the edge of origin box
-        [xo, yo, graphref] = path[0]
+        [xo, yo, graphref, d] = path[0]
         inpath = [ (xo, yo) ]
         if graphref in graphids:
             data = graphids[ graphref ]         
@@ -457,7 +497,7 @@ def gpml2svg(
                 path[0] = (xo, yo, graphref, d) # Amend the path, so we can just iterate through the middle and look left-right for all points
 
         # END: Draw out from edge of destination box
-        [xd, yd, graphref] = path[-1]
+        [xd, yd, graphref, d] = path[-1]
         outpath = [ (xd, yd) ]
         if graphref in graphids:                
             # END: Draw out from the edge of destination box
@@ -498,12 +538,14 @@ def gpml2svg(
                     inpath.append( 
                         {
                             'H' : (path[n][0], path[n-1][1]),
+                            '-' : (path[n][0], path[n][1]), # May be angled
                             'V' : (path[n-1][0], path[n][1])
                         }[ path[n-1][3] ] )
 
                     outpath.append( 
                         {
                             'H' : (path[n][0], path[n+1][1]),
+                            '-' : (path[n][0], path[n][1]), # May be angled
                             'V' : (path[n+1][0], path[n][1])
                         }[ path[n+1][3] ] )
                     pass
@@ -512,7 +554,8 @@ def gpml2svg(
             # Draw straight hook
             options = {
                 'H' : (path[-1][0], path[0][1]),
-                'V' : (path[0][0], path[-1][1])
+                'V' : (path[0][0], path[-1][1]),
+                '-' : (path[0][0], path[1][1]) # May be angled
                 }
             di = path[0][3] if path[0][3] in options else gdir #H/V
             inpath.append( options[di] )
@@ -531,7 +574,7 @@ def gpml2svg(
         # if matching, draw through that point to the end of current
 
 
-    metadata = {
+    render_data = {
         'page': page,
         'text': text,
         'data_nodes': data_nodes_svg,
@@ -544,8 +587,7 @@ def gpml2svg(
         'graphids': graphids,
     }
 
-    template = templateEngine.get_template( os.path.join( scriptdir,'gpml2svg.svg') )
-    return template.render( metadata )
+    return template.render( render_data ), metadata # return additional metadata
 
 def main():
     # Run from command line
@@ -567,11 +609,13 @@ def main():
     gpml = f.read().decode('utf8')
     f.close()
 
-    svg = gpml2svg( gpml )
+    svg, metadata = gpml2svg( gpml )
 
     if options.outfile is None:
         options.outfile = options.file.replace('gpml','svg')
         
+    print "Rendered pathway '%s' to SVG, saving as %s" % (metadata['Name'], options.outfile)
+
     o = codecs.open(options.outfile,'w','utf-8')
     o.write( svg )
     o.close()
