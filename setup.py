@@ -25,7 +25,8 @@ setup(
     download_url='https://github.com/mfitzp/gpml2svg/zipball/master',
     description='Render GPML pathway markup to SVG from the commandline/Python.',
     long_description='GPML2SVG is a command line and Python API for the conversion of pathways marked up \
-        using GPML to SVG. The command-line interface is currently basic. Simply call the script with the name of the \
+        using GPML (GenMAPP Pathway Markup Language) to SVG. \
+        The command-line interface is currently basic. Simply call the script with the name of the \
         GPML file to convert. The resulting SVG will be saved using the same name, with the \
         extension change to .svg. The resulting SVG is marked up with object identifiers, \
         and links to relevant databases. The python interface offers a single function call to which you can optionally provide \

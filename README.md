@@ -1,7 +1,8 @@
 # Introduction
 
 GPML2SVG is a command line and Python API for the conversion of pathways marked up 
-using [GPML][gpml] to SVG.
+using [GPML][gpml] (GenMAPP Pathway Markup Language) to SVG (Scalable Vector Graphics). 
+From there it's relatively simple to render to any standard image format, e.g. TIF, for publication.
 
 The command-line interface is currently basic. Simply call the script with the name of the 
 GPML file to convert. The resulting SVG will be saved using the same name, with the
