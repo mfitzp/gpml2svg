@@ -1,2 +1,2 @@
 include COPYING LICENSE
-include gpml2svg.svg
+include gpml2svg/gpml2svg.svg
