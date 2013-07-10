@@ -22,7 +22,8 @@ import pkg_resources
 
 
 # Standard definitions
-et.register_namespace('', 'http://pathvisio.org/GPML/2013a')
+# Removed for 2.6 compatibility
+# et.register_namespace('', 'http://pathvisio.org/GPML/2013a')
 
 GPML2SVG_XREF_URLS = {
     'HMDB': 'http://www.hmdb.ca/metabolites/%s',
@@ -599,11 +600,17 @@ def main():
     parser.add_option("-o", "--outfile", dest="outfile", default=None,
                       help="save resulting SVG with this name (if you omit this option it will be saved with the same name as source GPML with the extension changed)", metavar="FILE")
 
+    parser.add_option("-v", dest="show_version", action="store_true", default=None, 
+                      help="show version number")
+
     (options, args) = parser.parse_args()
+    if options.show_version:
+        print "Version %s" % pkg_resources.get_distribution("gpml2svg").version
+        sys.exit(1)
+
     if options.file is None:
         parser.print_help()
         sys.exit(1)
-
 
     f = open(options.file,'r')
     gpml = f.read().decode('utf8')

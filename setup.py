@@ -7,7 +7,7 @@ distribute_setup.use_setuptools()
 
 from setuptools import setup, find_packages
 
-version_string = '0.1.14'
+version_string = '0.1.15'
 
 # Defaults for py2app / cx_Freeze
 default_build_options=dict(
