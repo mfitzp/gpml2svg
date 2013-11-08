@@ -34,7 +34,7 @@
 }
 
 .shape {
-    fill:white;
+    fill:none;
 }
 
 

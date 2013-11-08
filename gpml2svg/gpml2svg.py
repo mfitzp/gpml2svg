@@ -605,7 +605,7 @@ def main():
 
     (options, args) = parser.parse_args()
     if options.show_version:
-        print "Version %s" % pkg_resources.get_distribution("gpml2svg").version
+        print "GPML2SVG v%s" % pkg_resources.get_distribution("gpml2svg").version
         sys.exit(1)
 
     if options.file is None:
