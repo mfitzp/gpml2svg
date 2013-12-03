@@ -2,9 +2,6 @@
 # coding=utf-8
 
 import sys
-import distribute_setup
-distribute_setup.use_setuptools()
-
 from setuptools import setup, find_packages
 
 version_string = '0.1.17'
