@@ -238,12 +238,9 @@ GPML2SVG_TEMPLATE = """@require(page, text, data_nodes, labels, shapes, groups, 
 
 </svg>"""
 
-
-
 class PkgLoader(object):
     def load(self,name):
         return GPML2SVG_TEMPLATE
-
 
 def get_edge( x, y, xo, yo, xt, yt):
     # Define a box by xo->xo+width, yo->yo+width
