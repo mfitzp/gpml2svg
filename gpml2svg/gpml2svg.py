@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 import os, re, cgi, codecs, copy, sys
 try:
@@ -374,7 +374,7 @@ def gpml2svg(
             xid = xr.attrib['ID']
             xrefs[ xdb ] = xid
             # Process Xref synonyms
-            if ( xdb, xid ) in xref_synonyms.keys():
+            if ( xdb, xid ) in list(xref_synonyms.keys()):
                 xref_extra = xref_synonyms[ ( xdb, xid ) ]
                 xrefs[ xref_extra[0] ] = xref_extra[1]
         
@@ -382,15 +382,15 @@ def gpml2svg(
             xrefs = xref_synonyms_fn( xrefs )
             
         url = None
-        for xdb, xid in xrefs.items():
-            if xdb in xref_urls.keys():
+        for xdb, xid in list(xrefs.items()):
+            if xdb in list(xref_urls.keys()):
                 url = xref_urls[ xdb ] % xid     
                 break
 
         # Data visualisation
         # xrs = list( dn.iterfind('Xref') )    
-        for xdb,xid in xrefs.items():
-            if (xdb,xid) in node_colors.keys():
+        for xdb,xid in list(xrefs.items()):
+            if (xdb,xid) in list(node_colors.keys()):
                 node_styles.append( 'fill:%s; stroke:%s;' % (node_colors[ (xdb,xid) ][0], node_colors[ (xdb,xid) ][0] ) )
                 text_styles.append( 'fill:%s;' % node_colors[ (xdb,xid) ][1] )
                 break
@@ -563,9 +563,9 @@ def gpml2svg(
         except:
             dims = shapedef['']
 
-        groups_svg.append( dict( {
+        groups_svg.append( dict( list({
                 'gstyle': gstyle,
-        }.items() + dims.items() ) )
+        }.items()) + list(dims.items()) ) )
 
 
     # Lines/interactions are visually identical; process the same
@@ -805,7 +805,7 @@ def main():
 
     (options, args) = parser.parse_args()
     if options.show_version:
-        print "GPML2SVG v%s" % pkg_resources.get_distribution("gpml2svg").version
+        print("GPML2SVG v%s" % pkg_resources.get_distribution("gpml2svg").version)
         sys.exit(1)
 
     if options.file is None:
@@ -821,7 +821,7 @@ def main():
     if options.outfile is None:
         options.outfile = options.file.replace('gpml','svg')
         
-    print "Rendered pathway '%s' to SVG, saving as %s" % (metadata['Name'], options.outfile)
+    print("Rendered pathway '%s' to SVG, saving as %s" % (metadata['Name'], options.outfile))
 
     o = codecs.open(options.outfile,'w','utf-8')
     o.write( svg )
